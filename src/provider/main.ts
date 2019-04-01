@@ -13,6 +13,7 @@ import {win10Check} from './snapanddock/utils/platform';
 import {TabService} from './tabbing/TabService';
 import {createErrorBox} from './utils/error';
 import {WindowHandler} from './WindowHandler';
+import { childWindowPlaceholderCheck } from './workspaces/placeholder';
 
 export type ConfigStore = Store<ConfigurationObject>;
 
@@ -23,6 +24,7 @@ export let snapService: SnapService;
 export let tabService: TabService;
 export let apiHandler: APIHandler;
 export let windowHandler: WindowHandler;
+export let monitorScalingLevel: number;
 
 declare const window: Window&{
     config: ConfigStore;
@@ -31,30 +33,31 @@ declare const window: Window&{
     snapService: SnapService;
     tabService: TabService;
     apiHandler: APIHandler;
+    monitorScalingLevel: number;
 };
 
 fin.desktop.main(main);
 
 export async function main() {
     const monitorInfo = await fin.System.getMonitorInfo();
-
+    monitorScalingLevel = window.monitorScalingLevel = monitorInfo.deviceScaleFactor;
     // Disable the service if display scaling is not 100%
-    if (monitorInfo.deviceScaleFactor !== 1) {
-        console.error('Desktop has non-standard display scaling. Notifying user and disabling all layouts functionality.');
+    // if (monitorInfo.deviceScaleFactor !== 1) {
+    //     console.error('Desktop has non-standard display scaling. Notifying user and disabling all layouts functionality.');
 
-        const errorMessage =
-            'OpenFin Layouts will only work with monitors that are set to a scaling ratio of 100%. This can be changed in monitor or display settings. \n\nPlease contact <a href="mailto:support@openfin.co">support@openfin.co</a> with any further questions.';
-        const title = 'OpenFin Layouts Notice';
-        await createErrorBox(title, errorMessage);
+    //     const errorMessage =
+    //         'OpenFin Layouts will only work with monitors that are set to a scaling ratio of 100%. This can be changed in monitor or display settings. \n\nPlease contact <a href="mailto:support@openfin.co">support@openfin.co</a> with any further questions.';
+    //     const title = 'OpenFin Layouts Notice';
+    //     await createErrorBox(title, errorMessage);
 
-        const providerChannel: ChannelProvider = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
-        providerChannel.setDefaultAction(() => {
-            throw Error(
-                'OpenFin Layouts will only work with monitors that are set to a scaling ratio of 100%. This can be changed in monitor or display settings. \n\nPlease contact support@openfin.co with any further questions. \n');
-        });
+    //     const providerChannel: ChannelProvider = await fin.InterApplicationBus.Channel.create(SERVICE_CHANNEL);
+    //     providerChannel.setDefaultAction(() => {
+    //         throw Error(
+    //             'OpenFin Layouts will only work with monitors that are set to a scaling ratio of 100%. This can be changed in monitor or display settings. \n\nPlease contact support@openfin.co with any further questions. \n');
+    //     });
 
-        return;  // NOTE: Service will still be running, but will not function.
-    }
+    //     return;  // NOTE: Service will still be running, but will not function.
+    // }
 
     config = window.config = new Store(require('../../gen/provider/config/defaults.json'));
     loader = window.loader = new Loader(config, 'layouts', {enabled: false});

@@ -7,7 +7,7 @@ import {LayoutsEvent} from '../../client/connection';
 import {SERVICE_IDENTITY} from '../../client/internal';
 import {WindowState} from '../../client/workspaces';
 import {EVENT_CHANNEL_TOPIC} from '../APIMessages';
-import {apiHandler} from '../main';
+import {apiHandler, monitorScalingLevel} from '../main';
 import {Aggregators, Signal1, Signal2} from '../Signal';
 import {Debounced} from '../snapanddock/utils/Debounced';
 import {isWin10} from '../snapanddock/utils/platform';
@@ -342,6 +342,8 @@ export class DesktopWindow implements DesktopEntity {
 
     private _moveInProgress = false;
     private _userInitiatedBoundsChange = false;
+    private _firstBounds: fin.WindowBoundsEvent|null = null;
+    private _isMove = true;
 
     constructor(model: DesktopModel, window: fin.WindowOptions|Window, initialState?: EntityState) {
         const identity = DesktopWindow.getIdentity(window);
@@ -1030,6 +1032,8 @@ export class DesktopWindow implements DesktopEntity {
 
             // Setting this here instead of in 'end-user-bounds-changing' event to ensure we are still synced when this method is called.
             this._userInitiatedBoundsChange = false;
+            this._firstBounds = null;
+            this._isMove = true;
         } else {
             this.onModified.emit(this);
         }
@@ -1053,11 +1057,22 @@ export class DesktopWindow implements DesktopEntity {
 
     private getTransformType(event: fin.WindowBoundsEvent): Mask<eTransformType> {
         // Convert 'changeType' into our enum type
+        if(monitorScalingLevel !== 1) {
+            if(this._firstBounds) {
+                const heightChange = Math.abs(event.height - this._firstBounds.height);
+                const widthChange = Math.abs(event.width - this._firstBounds.width);
+                if(heightChange > 1 || widthChange > 1) {
+                    this._isMove = false;
+                }
+            }
+            return (this._isMove || event.changeType === 2) ? 1 : event.changeType + 1;
+        } 
         return event.changeType + 1;
     }
 
     private handleBeginUserBoundsChanging(event: fin.WindowBoundsEvent) {
         this._userInitiatedBoundsChange = true;
+        this._firstBounds = event;
     }
 
     private handleClosing(): void {
