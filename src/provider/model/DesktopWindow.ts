@@ -1040,9 +1040,9 @@ export class DesktopWindow implements DesktopEntity {
 
         let transformType: Mask<eTransformType>;
 
-        if (this._userInitiatedBoundsChange) {
-            transformType = this.updateTransformType(event, this._userInitiatedBoundsChange);
-        }
+        // if (this._userInitiatedBoundsChange) {
+        //     transformType = this.updateTransformType(event, this._userInitiatedBoundsChange);
+        // }
 
         this.updateState({center, halfSize}, ActionOrigin.APPLICATION);
 
@@ -1070,9 +1070,9 @@ export class DesktopWindow implements DesktopEntity {
 
         let transformType: Mask<eTransformType>;
 
-        if (this._userInitiatedBoundsChange) {
-            transformType = this.updateTransformType(event, this._userInitiatedBoundsChange);
-        }
+        // if (this._userInitiatedBoundsChange) {
+        //     transformType = this.updateTransformType(event, this._userInitiatedBoundsChange);
+        // }
 
         this.updateState({center, halfSize}, ActionOrigin.APPLICATION);
 
@@ -1125,9 +1125,9 @@ export class DesktopWindow implements DesktopEntity {
             const newTransformType = boundsChange.transformType;
 
             if (newTransformType === eTransformType.MOVE && prevTransformType !== eTransformType.MOVE) {
-                this._snapGroup.suspendResizeConstraints();
+                // this._snapGroup.suspendResizeConstraints();
             } else if (newTransformType !== eTransformType.MOVE && prevTransformType === eTransformType.MOVE) {
-                this._snapGroup.restoreResizeConstraints();
+                // this._snapGroup.restoreResizeConstraints();
             }
 
             return newTransformType;
@@ -1142,7 +1142,7 @@ export class DesktopWindow implements DesktopEntity {
 
         this._userInitiatedBoundsChange = {startBounds, transformType: 0};
 
-        this.updateTransformType(event, this._userInitiatedBoundsChange);
+        // this.updateTransformType(event, this._userInitiatedBoundsChange);
 
         // Temporary extra validation to workaround runtime issues with windows right-click move
         // TODO: Removed once runtime has better handling of this edge case (RUN-5074?)
@@ -1156,7 +1156,7 @@ export class DesktopWindow implements DesktopEntity {
                 if (this._tabGroup) {
                     this._tabGroup.validate();
                 } else {
-                    this._snapGroup.validate();
+                    // this._snapGroup.validate();
                 }
             }
             this._window.removeListener('disabled-frame-bounds-changing', disabledListener);
@@ -1174,15 +1174,15 @@ export class DesktopWindow implements DesktopEntity {
 
     private async handleFocused(): Promise<void> {
         // If we're not maximized ourselves, bring all snapped, non-maximized windows to the front
-        if (!this.isMaximizedOrInMaximizedTab()) {
-            this._snapGroup.windows
-                .filter(snapGroupWindow => snapGroupWindow !== this && !snapGroupWindow.isMaximizedOrInMaximizedTab() && !snapGroupWindow.currentState.hidden)
-                .forEach(snapGroupWindow => snapGroupWindow.bringToFront());
-        } else if (this._tabGroup && this._tabGroup.state === 'maximized') {
-            this._snapGroup.windows
-                .filter(snapGroupWindow => snapGroupWindow !== this && snapGroupWindow._tabGroup === this._tabGroup)
-                .forEach(snapGroupWindow => snapGroupWindow.bringToFront());
-        }
+        // if (!this.isMaximizedOrInMaximizedTab()) {
+        //     this._snapGroup.windows
+        //         .filter(snapGroupWindow => snapGroupWindow !== this && !snapGroupWindow.isMaximizedOrInMaximizedTab() && !snapGroupWindow.currentState.hidden)
+        //         .forEach(snapGroupWindow => snapGroupWindow.bringToFront());
+        // } else if (this._tabGroup && this._tabGroup.state === 'maximized') {
+        //     this._snapGroup.windows
+        //         .filter(snapGroupWindow => snapGroupWindow !== this && snapGroupWindow._tabGroup === this._tabGroup)
+        //         .forEach(snapGroupWindow => snapGroupWindow.bringToFront());
+        // }
     }
 
     private async handleGroupChanged(event: fin.WindowGroupChangedEvent): Promise<void> {

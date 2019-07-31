@@ -811,11 +811,11 @@ export class DesktopTabGroup implements DesktopEntity {
             halfSize: {x: this.activeTab.currentState.halfSize.x, y: this._config.height / 2}
         };
 
-        if (!RectUtils.isEqual(expectedTabstripPosition, this._window.currentState)) {
-            console.log('TabGroup disjointed. Moving tabstrip back to group.', this.id);
-            await DesktopWindow.transaction([this._window], async (wins: DesktopWindow[]) => {
-                await wins[0].applyProperties(expectedTabstripPosition);
-            });
-        }
+        // if (!RectUtils.isEqual(expectedTabstripPosition, this._window.currentState)) {
+        //     console.log('TabGroup disjointed. Moving tabstrip back to group.', this.id);
+        //     await DesktopWindow.transaction([this._window], async (wins: DesktopWindow[]) => {
+        //         await wins[0].applyProperties(expectedTabstripPosition);
+        //     });
+        // }
     }
 }
