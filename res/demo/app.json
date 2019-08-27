@@ -13,11 +13,10 @@
     },
     "runtime": {
         "arguments": "--v=1 --enable-crash-reporting --inspect=9222 --enable-aggressive-domstorage-flushing",
-        "version": "9.61.38.41"
+        "version": "13.76.43.30"
     },
     "services": [{
-        "name": "layouts",
-        "manifestUrl": "http://localhost:1337/provider/app.json",
+        "name": "layouts-nolaunch",
         "config": {
             "rules": [{
                 "scope": {"level": "window", "uuid": "Layouts-Manager", "name": "Layouts-Manager"},

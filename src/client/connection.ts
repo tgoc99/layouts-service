@@ -29,6 +29,16 @@ import {APITopic, SERVICE_CHANNEL} from './internal';
  */
 declare const PACKAGE_VERSION: string;
 
+// NEED TO MAKE THIS NOT HARD CODED?
+const LAYOUTS_UUID = 'layouts-service';
+const layoutsAppOptions = {
+    uuid: LAYOUTS_UUID,
+    name: LAYOUTS_UUID,
+    url: 'http://localhost:1337/provider/provider.html', //'https://cdn.openfin.co/services/openfin/layouts/1.0.5/provider.html',
+    autoShow: true,
+    nonPersistent: true
+}
+
 /**
  * Defines all events that are fired by the service
  */
@@ -43,12 +53,30 @@ export const eventEmitter = new EventEmitter();
  * Promise to the channel object that allows us to connect to the client
  */
 let channelPromise: Promise<ChannelClient>|null = null;
+let serviceRunning: boolean|null = null;
 
 if (typeof fin !== 'undefined') {
     getServicePromise();
 }
 
-export function getServicePromise(): Promise<ChannelClient> {
+export async function getServicePromise(): Promise<ChannelClient> {
+    if(!serviceRunning) {
+        typeof fin === 'undefined' ?
+        Promise.reject(new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.')) :
+        fin.Application.wrapSync({uuid: LAYOUTS_UUID}).isRunning().then(isRunning => {
+            if(!isRunning) {
+                // START LAYOUTS APP PROGRAMMATICALLY
+                console.log('not running, launching')
+                // tslint:disable-line
+                fin.Application.start(layoutsAppOptions).then(() => {
+                    console.log('launched programmatically')
+                    serviceRunning = true;
+                }).catch(console.error);
+            } else {
+                serviceRunning = true;
+            }
+        })
+    }
     if (!channelPromise) {
         channelPromise = typeof fin === 'undefined' ?
             Promise.reject(new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.')) :
@@ -65,7 +93,7 @@ export function getServicePromise(): Promise<ChannelClient> {
             });
     }
 
-    return channelPromise;
+    return channelPromise
 }
 
 /**
@@ -73,5 +101,6 @@ export function getServicePromise(): Promise<ChannelClient> {
  */
 export async function tryServiceDispatch<T, R>(action: APITopic, payload?: T): Promise<R> {
     const channel: ChannelClient = await getServicePromise();
+    console.log('got past channelpromise')
     return channel.dispatch(action, payload) as Promise<R>;
 }

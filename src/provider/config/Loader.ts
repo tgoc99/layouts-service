@@ -163,6 +163,8 @@ export class Loader<T> {
             if (isManifest && manifest.services && manifest.services.length) {
                 // Check for service declaration within app manifest
                 manifest.services.forEach((service: ServiceDeclaration<T>) => {
+                    console.log('in onappcreated, service declared', JSON.stringify(service));
+                    console.log('in onappcreated, services internal', JSON.stringify(this._serviceNames));
                     if (this._serviceNames.includes(service.name)) {
                         // App explicitly requests service, avoid adding any default config
                         isServiceAware = true;
@@ -170,10 +172,13 @@ export class Loader<T> {
                         if (service.config) {
                             console.log(`Using config from ${identity.uuid}/${service.name}`);
 
+                            const defaultOff = { features: { dock: false, tab: false } };
                             // Load the config from the application's manifest
-                            appConfig = service.config;
+                            appConfig = { ...defaultOff, ...service.config };
+                            console.log('appconfig to load:', JSON.stringify(appConfig));
                         } else {
                             console.log(`App ${identity.uuid}/${service.name} declares service, but doesn't contain config`);
+                            appConfig = this._defaultConfig;
                         }
                     }
                 });
@@ -217,6 +222,7 @@ export class Loader<T> {
 
             // If there's config for this app (whether app-defined or default), add it to the store
             if (appConfig) {
+                console.log('about to add this config:', JSON.stringify(appConfig))
                 const state = this.getOrCreateAppState(app, isServiceAware);
                 this._store.add(state.scope, appConfig);
             }
