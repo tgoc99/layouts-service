@@ -80,17 +80,17 @@ export async function getServicePromise(): Promise<ChannelClient> {
     }
     if (!channelPromise) {
         channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}})
-        .then((channel: ChannelClient) => {
-            // Register service listeners
-            channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
-            channel.register('event', (event: LayoutsEvent) => {
-                eventEmitter.emit(event.type, event);
-            });
-            // Any unregistered action will simply return false
-            channel.setDefaultAction(() => false);
+            .then((channel: ChannelClient) => {
+                // Register service listeners
+                channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
+                channel.register('event', (event: LayoutsEvent) => {
+                    eventEmitter.emit(event.type, event);
+                });
+                // Any unregistered action will simply return false
+                channel.setDefaultAction(() => false);
 
-            return channel;
-        });
+                return channel;
+            });
 
     return channelPromise;
 }
