@@ -58,13 +58,14 @@ if (typeof fin !== 'undefined') {
 }
 
 export async function getServicePromise(): Promise<ChannelClient> {
+    if (typeof fin === 'undefined') {
+        throw new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.')
+    }
     if(!serviceRunning) {
-        typeof fin === 'undefined' ?
-        Promise.reject(new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.')) :
         fin.Application.wrapSync({uuid: LAYOUTS_UUID}).isRunning().then(isRunning => {
-            if(!isRunning) {
+            if (!isRunning) {
                 // START LAYOUTS APP PROGRAMMATICALLY
-                console.log('not running, launching')
+                console.log('not running, launching');
                 // need to use create to make backward compatible
                 fin.Application.create(layoutsAppOptions).then(a => {
                     a.run().then(() => {
@@ -77,21 +78,19 @@ export async function getServicePromise(): Promise<ChannelClient> {
             }
         })
     }
-    if (!channelPromise) {
-        channelPromise = typeof fin === 'undefined' ?
-            Promise.reject(new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.')) :
-            fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}}).then((channel: ChannelClient) => {
-                // Register service listeners
-                channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
-                channel.register('event', (event: LayoutsEvent) => {
-                    eventEmitter.emit(event.type, event);
-                });
-                // Any unregistered action will simply return false
-                channel.setDefaultAction(() => false);
-
-                return channel;
+    channelPromise = channelPromise || 
+        fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}})
+        .then((channel: ChannelClient) => {
+            // Register service listeners
+            channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
+            channel.register('event', (event: LayoutsEvent) => {
+                eventEmitter.emit(event.type, event);
             });
-    }
+            // Any unregistered action will simply return false
+            channel.setDefaultAction(() => false);
+
+            return channel;
+        });
 
     return channelPromise;
 }
