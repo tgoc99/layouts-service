@@ -57,7 +57,7 @@ if (typeof fin !== 'undefined') {
     getServicePromise();
 }
 
-export async function getServicePromise(): Promise<ChannelClient> {
+export function getServicePromise(): Promise<ChannelClient> {
     if (typeof fin === 'undefined') {
         throw new Error('fin is not defined. The openfin-layouts module is only intended for use in an OpenFin application.')
     }
@@ -91,6 +91,7 @@ export async function getServicePromise(): Promise<ChannelClient> {
 
                 return channel;
             });
+    }
 
     return channelPromise;
 }
