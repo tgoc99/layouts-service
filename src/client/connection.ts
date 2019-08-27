@@ -28,7 +28,6 @@ import {APITopic, SERVICE_CHANNEL} from './internal';
  * Webpack replaces any instances of this constant with a hard-coded string at build time.
  */
 declare const PACKAGE_VERSION: string;
-// NEED TO MAKE THIS NOT HARD CODED?
 const LAYOUTS_UUID = 'layouts-service';
 const layoutsAppOptions = {
     uuid: LAYOUTS_UUID,
