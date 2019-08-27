@@ -69,7 +69,7 @@ export async function getServicePromise(): Promise<ChannelClient> {
                 // need to use create to make backward compatible
                 fin.Application.create(layoutsAppOptions).then(a => {
                     a.run().then(() => {
-                        console.log('launched programmatically')
+                        console.log('launched programmatically');
                         serviceRunning = true;
                     }).catch(console.error);
                 }).catch(console.error);
