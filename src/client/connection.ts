@@ -78,8 +78,8 @@ export async function getServicePromise(): Promise<ChannelClient> {
             }
         })
     }
-    channelPromise = channelPromise || 
-        fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}})
+    if (!channelPromise) {
+        channelPromise = fin.InterApplicationBus.Channel.connect(SERVICE_CHANNEL, {payload: {version: PACKAGE_VERSION}})
         .then((channel: ChannelClient) => {
             // Register service listeners
             channel.register('WARN', (payload: any) => console.warn(payload));  // tslint:disable-line:no-any
