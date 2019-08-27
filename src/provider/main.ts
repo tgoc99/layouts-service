@@ -34,6 +34,15 @@ declare const window: Window&{
 
 fin.desktop.main(main);
 
+// this actually enabled snapping for ALL apps, even if layouts isnt in manifest
+const newDefaults = {
+    features: {
+        snap: true,
+        dock: false,
+        tab: false
+    }
+}
+
 const supportedScaleFactors = [1, 1.5, 2];
 
 export async function main() {
@@ -61,7 +70,7 @@ Please contact support@openfin.co with any further questions.`;
     }
 
     config = window.config = new Store(require('../../gen/provider/config/defaults.json'));
-    loader = window.loader = new Loader(config, 'layouts', {enabled: false});
+    loader = window.loader = new Loader(config, ['layouts', 'layouts-nolaunch'], newDefaults);
     model = window.model = new DesktopModel(config);
     windowHandler = new WindowHandler(config);
     snapService = window.snapService = new SnapService(model, config);

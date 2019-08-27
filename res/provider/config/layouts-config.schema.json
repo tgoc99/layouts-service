@@ -275,8 +275,8 @@
                     },
                     "default": {
                         "snap": true,
-                        "dock": true,
-                        "tab": true
+                        "dock": false,
+                        "tab": false
                     },
                     "additionalProperties": false
                 },
