@@ -174,7 +174,7 @@ export class DesktopWindow implements DesktopEntity {
                     // define a title. We would like to instead use the window name, to align with what is seen in the
                     // un-tabbed window frame.
 
-                    // Current stable (13.76.43.31) behaviour is to return 'host+pathname+search+hash'. There is also a
+                    // Current stable (13.76.44.17) behaviour is to return 'host+pathname+search+hash'. There is also a
                     // story (RUN-3457) to change this to 'host+pathname'. We will check for both of these strings, and
                     // revert to the window name if the title matches either
                     const parsedUrl = new URL(url);
@@ -760,6 +760,7 @@ export class DesktopWindow implements DesktopEntity {
     }
 
     private snap(): Promise<void> {
+        debugger;
         const group: DesktopSnapGroup = this._snapGroup;
         const windows: DesktopWindow[] = this._snapGroup.windows as DesktopWindow[];
         const count = windows.length;
@@ -841,6 +842,8 @@ export class DesktopWindow implements DesktopEntity {
     }
 
     private async updateState(delta: Partial<EntityState>, origin: ActionOrigin): Promise<void> {
+        console.log('here, update state')
+
         const actions: Promise<void>[] = [];
 
         if (origin !== ActionOrigin.APPLICATION) {
@@ -926,6 +929,8 @@ export class DesktopWindow implements DesktopEntity {
 
             // Apply bounds
             if (center || halfSize) {
+                console.log('here, center half');
+                debugger;
                 const state: EntityState = this._currentState;
                 let newCenter = center || state.center, newHalfSize = halfSize || state.halfSize;
 
@@ -1090,59 +1095,59 @@ export class DesktopWindow implements DesktopEntity {
     }
 
     private updateTransformType(event: fin.WindowBoundsEvent, boundsChange: BoundsChange): Mask<eTransformType> {
-        // If display scaling is enabled, distrust the changeType given by the runtime
-        if (this._model.displayScaling) {
-            const prevTransformType = boundsChange.transformType;
+        // // If display scaling is enabled, distrust the changeType given by the runtime
+        // if (this._model.displayScaling) {
+        //     const prevTransformType = boundsChange.transformType;
 
-            const startBounds = boundsChange.startBounds;
+        //     const startBounds = boundsChange.startBounds;
 
-            const bounds = this.checkBounds(event);
-            const halfSize = {x: bounds.width / 2, y: bounds.height / 2};
-            const center = {x: bounds.left + halfSize.x, y: bounds.top + halfSize.y};
+        //     const bounds = this.checkBounds(event);
+        //     const halfSize = {x: bounds.width / 2, y: bounds.height / 2};
+        //     const center = {x: bounds.left + halfSize.x, y: bounds.top + halfSize.y};
 
-            const evaluateAxis = (axis: 'x'|'y') => {
-                const resize = Math.abs(halfSize[axis] - startBounds.halfSize[axis]) * 2 > MINIMUM_RESIZE_CHANGE;
-                let expectedCenter: number;
+        //     const evaluateAxis = (axis: 'x'|'y') => {
+        //         const resize = Math.abs(halfSize[axis] - startBounds.halfSize[axis]) * 2 > MINIMUM_RESIZE_CHANGE;
+        //         let expectedCenter: number;
 
-                if (!resize) {
-                    expectedCenter = startBounds.center[axis];
-                } else {
-                    const sizeChangeSign = Math.sign(halfSize[axis] - startBounds.halfSize[axis]);
-                    // If start and new centers are equal, arbitrarily pick a sign, so as to not
-                    // accidentally support 'symmetrical' resize from both edges
-                    const centerChangeSign = Math.sign(center[axis] - startBounds.center[axis]) || 1;
+        //         if (!resize) {
+        //             expectedCenter = startBounds.center[axis];
+        //         } else {
+        //             const sizeChangeSign = Math.sign(halfSize[axis] - startBounds.halfSize[axis]);
+        //             // If start and new centers are equal, arbitrarily pick a sign, so as to not
+        //             // accidentally support 'symmetrical' resize from both edges
+        //             const centerChangeSign = Math.sign(center[axis] - startBounds.center[axis]) || 1;
 
-                    const expectedEdgeChanged = sizeChangeSign * centerChangeSign;
+        //             const expectedEdgeChanged = sizeChangeSign * centerChangeSign;
 
-                    expectedCenter = startBounds.center[axis] + expectedEdgeChanged * (halfSize[axis] - startBounds.halfSize[axis]);
-                }
+        //             expectedCenter = startBounds.center[axis] + expectedEdgeChanged * (halfSize[axis] - startBounds.halfSize[axis]);
+        //         }
 
-                const move = Math.abs(expectedCenter - center[axis]) > MINIMUM_MOVE_CHANGE;
+        //         const move = Math.abs(expectedCenter - center[axis]) > MINIMUM_MOVE_CHANGE;
 
-                return (move ? eTransformType.MOVE : 0) | (resize ? eTransformType.RESIZE : 0);
-            };
+        //         return (move ? eTransformType.MOVE : 0) | (resize ? eTransformType.RESIZE : 0);
+        //     };
 
-            boundsChange.transformType |= evaluateAxis('x');
-            boundsChange.transformType |= evaluateAxis('y');
+        //     boundsChange.transformType |= evaluateAxis('x');
+        //     boundsChange.transformType |= evaluateAxis('y');
 
-            // Err on the side of regarding transforms as purely moves
-            if ((boundsChange.transformType & eTransformType.MOVE)) {
-                boundsChange.transformType = eTransformType.MOVE;
-            }
+        //     // Err on the side of regarding transforms as purely moves
+        //     if ((boundsChange.transformType & eTransformType.MOVE)) {
+        //         boundsChange.transformType = eTransformType.MOVE;
+        //     }
 
-            const newTransformType = boundsChange.transformType;
+        //     const newTransformType = boundsChange.transformType;
 
-            if (newTransformType === eTransformType.MOVE && prevTransformType !== eTransformType.MOVE) {
-                this._snapGroup.suspendResizeConstraints();
-            } else if (newTransformType !== eTransformType.MOVE && prevTransformType === eTransformType.MOVE) {
-                this._snapGroup.restoreResizeConstraints();
-            }
+        //     if (newTransformType === eTransformType.MOVE && prevTransformType !== eTransformType.MOVE) {
+        //         this._snapGroup.suspendResizeConstraints();
+        //     } else if (newTransformType !== eTransformType.MOVE && prevTransformType === eTransformType.MOVE) {
+        //         this._snapGroup.restoreResizeConstraints();
+        //     }
 
-            return newTransformType;
-        } else {
+        //     return newTransformType;
+        // } else {
             // Convert 'changeType' into our enum type
             return event.changeType + 1;
-        }
+        // }
     }
 
     private handleBeginUserBoundsChanging(event: fin.WindowBoundsEvent) {

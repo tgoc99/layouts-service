@@ -231,10 +231,10 @@ export class DesktopSnapGroup {
         // Ensure 'group' is still a valid, contiguous group.
         const contiguousWindowSets = getContiguousEntities(this.entities);
         if (contiguousWindowSets.length > 1) {                      // Group is disjointed. Need to split.
-            await Promise.all(contiguousWindowSets.slice(1).map(set => {  // Leave first set as-is. Move others into own groups.
-                const newGroup = new DesktopSnapGroup();
-                return Promise.all(set.map(window => window.setSnapGroup(newGroup)));
-            }));
+            // await Promise.all(contiguousWindowSets.slice(1).map(set => {  // Leave first set as-is. Move others into own groups.
+            //     const newGroup = new DesktopSnapGroup();
+            //     return Promise.all(set.map(window => window.setSnapGroup(newGroup)));
+            // }));
         }
     }
 

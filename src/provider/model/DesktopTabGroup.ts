@@ -865,16 +865,16 @@ export class DesktopTabGroup implements DesktopEntity {
 
         if (repositionTabstrip) {
             console.log('TabGroup disjointed. Moving tabstrip back to group.', this.id);
-            await DesktopWindow.transaction([this._window], async () => {
-                await this._window.applyProperties(expectedTabstripPosition);
-            });
+            // await DesktopWindow.transaction([this._window], async () => {
+            //     await this._window.applyProperties(expectedTabstripPosition);
+            // });
         }
 
         if (tabsToReposition.length > 0) {
             console.log('TabGroup disjointed. Moving tabs back to group', this.id);
-            await DesktopWindow.transaction(tabsToReposition, async () => {
-                await Promise.all(tabsToReposition.map(tab => tab.applyProperties(expectedTabPosition)));
-            });
+            // await DesktopWindow.transaction(tabsToReposition, async () => {
+            //     await Promise.all(tabsToReposition.map(tab => tab.applyProperties(expectedTabPosition)));
+            // });
         }
     }
 

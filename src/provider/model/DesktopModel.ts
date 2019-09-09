@@ -450,6 +450,7 @@ export class DesktopModel {
     }
 
     private onSnapGroupCreated(group: DesktopSnapGroup): void {
+        debugger;
         this._snapGroups.push(group);
     }
 
